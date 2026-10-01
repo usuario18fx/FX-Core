@@ -32,3 +32,20 @@
 .avatar-voice{bottom:5%}
 @media(max-height:760px) and (min-width:821px){.avatar-wrap{transform:translateY(3%)}.holo-image{width:82%;height:82%}}
 @media(max-width:820px){.avatar-wrap{transform:translateY(2%)}.holo-image{width:86%;height:86%}.base{bottom:0}}
+
+/* Canal Directo · interaction layer */
+.direct{transition:border-color .28s ease,box-shadow .28s ease}
+.direct:focus-within{border-color:rgba(31,190,220,.5);box-shadow:inset 0 0 50px #02121f,0 0 28px rgba(0,190,225,.07)}
+.sound,.mic,.send,.quick button{transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease,color .18s ease}
+.sound:hover,.mic:hover{transform:translateY(-1px);border-color:rgba(62,231,255,.55);box-shadow:0 0 18px rgba(0,210,245,.09)}
+.quick button:hover:not(:disabled){transform:translateY(-1px);border-color:rgba(62,231,255,.5);background:rgba(5,43,57,.78);color:#75efff;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.quick button:active:not(:disabled),.sound:active,.mic:active,.send:active:not(:disabled){transform:scale(.96)}
+.composer input{transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
+.composer input:focus{border-color:rgba(62,231,255,.55);background:#020d18;box-shadow:0 0 0 3px rgba(32,198,225,.055),inset 0 0 18px rgba(0,190,225,.025)}
+.send:not(:disabled):hover{transform:translateY(-1px);background:#4bc9df;box-shadow:0 0 18px rgba(51,219,245,.15)}
+.msg{animation:fxMessageIn .3s cubic-bezier(.2,.75,.25,1) both}
+.msg.who-TÚ{transform-origin:right bottom}.msg:not(.who-TÚ){transform-origin:left bottom}
+.feed{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:rgba(26,154,181,.34) transparent}
+.feed::-webkit-scrollbar{width:5px}.feed::-webkit-scrollbar-thumb{background:rgba(26,154,181,.3);border-radius:8px}.feed::-webkit-scrollbar-track{background:transparent}
+@keyframes fxMessageIn{from{opacity:0;transform:translateY(7px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){.msg{animation:none}.feed{scroll-behavior:auto}.sound,.mic,.send,.quick button,.composer input,.direct{transition:none}}
