@@ -1,0 +1,3 @@
+import{runAction}from'./actionGateway';import{resolveProject}from'./projectRegistry';import type{ActionResult}from'./types';
+export type AgentStep={action:string;args:Record<string,unknown>;result:ActionResult};
+export async function investigateProject(message:string){const project=resolveProject(message);if(!project)return null;const steps:AgentStep[]=[];for(const task of[{action:'github.repo.get',args:{repo:project.repo}},{action:'github.file.get',args:{repo:project.repo,path:'package.json'}}]){const out=await runAction(task.action,task.args);if(out.kind!=='result')continue;steps.push({...task,result:out.result});}return{project,steps};}
