@@ -32,3 +32,18 @@ Preserve unrelated code. Do not use markdown fences. Do not invent another repos
  if(!raw)return null;
  try{const cleaned=raw.trim().replace(/^\`\`\`(?:json)?\s*/i,'').replace(/\s*\`\`\`$/,'');const parsed=JSON.parse(cleaned)as{content?:unknown;message?:unknown};if(typeof parsed.content!=='string')return null;return{intent:'github.file.update',action:'github.file.update',args:{repo,path,sha,content:parsed.content,message:typeof parsed.message==='string'?parsed.message:`FX: update ${path}`},confidence:.9,source:'model',reasoning:{needsTool:true,needsApproval:true}}}catch{return null}
 }
+
+export async function prepareLocalFix(message:string,project:string,path:string,currentContent:string,problem:unknown):Promise<BrainPlan|null>{
+ const prompt=`FX must repair one local project file after a real build failure.
+Project: ${project}
+Path: ${path}
+User request: ${message}
+Observed build problem: ${JSON.stringify(problem)}
+Current file:
+---FILE---
+${currentContent}
+---END FILE---
+Return ONLY valid JSON: {"content":"complete replacement file"}. Make the smallest correction supported by the observed error. Preserve unrelated code. No markdown.`;
+ const raw=(await planWithOllama(prompt))?.reply||(await planWithOpenAI(prompt))?.reply;if(!raw)return null;
+ try{const parsed=JSON.parse(raw.trim().replace(/^\`\`\`(?:json)?\\s*/i,'').replace(/\\s*\`\`\`$/,''))as{content?:unknown};if(typeof parsed.content!=='string'||parsed.content===currentContent)return null;return{intent:'local.file.update-build',action:'local.file.update-build',args:{project,path,content:parsed.content},confidence:.9,source:'model',reasoning:{needsTool:true,needsApproval:true}}}catch{return null}
+}
