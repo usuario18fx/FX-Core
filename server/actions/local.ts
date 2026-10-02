@@ -2,7 +2,7 @@ import{execFile}from'node:child_process';
 import{promisify}from'node:util';
 import{resolve,normalize}from'node:path';
 import{FX_PROJECTS}from'../projectRegistry';
-import type{ActionResult}from'./types';
+import type{ActionResult}from'../types';
 
 const exec=promisify(execFile);
 const MAX_BUFFER=1024*1024;
@@ -17,7 +17,7 @@ function projectPath(input:unknown){
  return{project,target};
 }
 async function run(action:string,file:string,args:string[],cwd:string):Promise<ActionResult>{
- try{const{stdout,stderr}=await exec(file,args,{cwd,timeout:TIMEOUT,maxBuffer:MAX_BUFFER,windowsHide:true});return{ok:true,action,data:{cwd,stdout:String(stdout).slice(-40000),stderr:String(stderr).slice(-20000)}}}
+ try{const{stdout,stderr}=await exec(file,args,{cwd,timeout:TIMEOUT,maxBuffer:MAX_BUFFER,windowsHide:true});return{ok:true,action,data:{cwd,exitCode:0,stdout:String(stdout).slice(-40000),stderr:String(stderr).slice(-20000)}}}
  catch(e:any){return{ok:false,action,error:e?.code==='ETIMEDOUT'?'local_command_timeout':'local_command_failed',data:{cwd,stdout:String(e?.stdout||'').slice(-40000),stderr:String(e?.stderr||e?.message||'').slice(-20000),exitCode:e?.code}}}
 }
 export async function localGitStatus(args:Record<string,unknown>):Promise<ActionResult>{try{const{target}=projectPath(args.project);return run('local.git.status','git',['status','--short','--branch'],target)}catch(e){return{ok:false,action:'local.git.status',error:String(e)}}}
