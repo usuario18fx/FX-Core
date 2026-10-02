@@ -6,7 +6,7 @@ import type{ActionResult}from'../types';
 
 const exec=promisify(execFile);
 const MAX_BUFFER=1024*1024;
-const TIMEOUT=120000;
+const TIMEOUT=45000;
 
 function projectPath(input:unknown){
  const id=String(input||'');
