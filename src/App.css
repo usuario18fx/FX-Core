@@ -112,3 +112,12 @@
 .project-card{min-height:180px}
 @media(min-width:1350px){.project-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.project-card{min-height:220px}}
 @media(max-width:700px){.project-hub-backdrop{overflow:auto;padding:24px 16px}.project-hub{max-height:none}.project-grid{grid-template-columns:1fr}}
+
+/* Projects Hub · force one-screen desktop layout */
+@media(min-width:1000px){
+ .project-hub-backdrop{padding:5vh 6vw 2vh}
+ .project-hub{width:min(1500px,100%)}
+ .project-hub>header{padding-bottom:18px}
+ .project-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+ .project-card{min-height:0;height:clamp(190px,29vh,260px);padding:20px}
+}
