@@ -67,3 +67,25 @@
 /* FX speaking stability · keep head centered */
 .state-speaking .holo-image{animation:none;transform:translate3d(0,0,0)}
 .state-speaking .avatar{transform:translate3d(0,0,0) scale(1.003)}
+
+/* FX 2050 neutral device shell · avatar hologram intentionally unchanged */
+:root{--shell:#aeb5ba;--shell-hi:#e1e5e7;--shell-mid:#8d969c;--shell-dark:#343b40;--glass:rgba(16,20,23,.78);--glass-line:rgba(222,232,236,.18)}
+.fx-app{background:radial-gradient(circle at 50% 18%,rgba(255,255,255,.08),transparent 28%),linear-gradient(145deg,#1b1f22 0%,#090b0d 48%,#171b1e 100%)}
+.stars{opacity:.2;background-image:radial-gradient(circle,rgba(220,229,233,.45) 1px,transparent 1.4px),linear-gradient(28deg,transparent 49.8%,rgba(210,220,224,.035) 50%,transparent 50.2%)}
+.topbar,.fx-app>footer{background:linear-gradient(180deg,rgba(34,39,42,.96),rgba(12,15,17,.98));border-color:rgba(220,230,234,.13);box-shadow:inset 0 1px rgba(255,255,255,.06)}
+.brand-icon{border-color:rgba(218,228,232,.28);color:#dce5e8;background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.015));box-shadow:inset 0 0 18px rgba(255,255,255,.035),0 4px 16px rgba(0,0,0,.32)}
+.brand b{color:#e8eef0}.topbar nav{color:#7f898e}.topbar nav b{color:#d7dfe2}
+.live{border-color:rgba(211,222,226,.22);color:#d9e2e5;background:rgba(255,255,255,.025)}.live i{background:#dce5e8;box-shadow:0 0 9px rgba(230,240,244,.42)}
+.top-actions button{color:#15191b;background:linear-gradient(180deg,#e0e5e7,#9da6aa);border:1px solid rgba(255,255,255,.36);box-shadow:inset 0 1px rgba(255,255,255,.75),0 7px 20px rgba(0,0,0,.28)}
+.direct{position:relative;border:1px solid rgba(226,235,238,.22);background:linear-gradient(145deg,rgba(31,36,39,.92),rgba(7,10,12,.96));box-shadow:inset 0 1px rgba(255,255,255,.08),inset 0 0 55px rgba(255,255,255,.018),0 24px 70px rgba(0,0,0,.42),0 0 0 5px rgba(151,160,165,.035)}
+.direct:before{content:"";position:absolute;z-index:0;inset:7px;border:1px solid rgba(255,255,255,.035);border-radius:21px;pointer-events:none}.direct>*{position:relative;z-index:1}
+.direct>header,.composer{border-color:rgba(222,232,236,.11)}.direct h1{color:#edf2f3}.direct header p{color:#929da2}
+.sound,.mic{border-color:rgba(220,230,234,.2);background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.012));color:#dce5e8;box-shadow:inset 0 1px rgba(255,255,255,.07)}
+.bubble{border-color:rgba(213,224,228,.15);background:linear-gradient(145deg,rgba(58,65,69,.52),rgba(23,28,31,.72));box-shadow:inset 0 1px rgba(255,255,255,.035)}.who-TÚ .bubble{background:linear-gradient(145deg,rgba(73,81,85,.48),rgba(31,36,39,.78))}
+.msg-avatar{border-color:rgba(217,228,232,.22)}.bubble p{color:#e5ebed}
+.quick button{border-color:rgba(218,228,232,.17);background:rgba(255,255,255,.025);color:#aeb8bc}.quick button:hover:not(:disabled){border-color:rgba(235,242,244,.34);background:rgba(255,255,255,.065);color:#edf2f3;box-shadow:0 7px 22px rgba(0,0,0,.26)}
+.composer input{border-color:rgba(220,230,234,.16);background:rgba(3,5,6,.56);color:#eef3f4;box-shadow:inset 0 2px 14px rgba(0,0,0,.3)}.composer input::placeholder{color:#778287}.composer input:focus{border-color:rgba(232,240,242,.34);background:rgba(5,7,8,.72);box-shadow:0 0 0 3px rgba(235,242,244,.035),inset 0 2px 14px rgba(0,0,0,.34)}
+.send{background:linear-gradient(180deg,#d8dee0,#818b90);color:#111517;box-shadow:inset 0 1px rgba(255,255,255,.72),0 5px 16px rgba(0,0,0,.28)}
+.approval-card{border-color:rgba(224,234,237,.22);background:linear-gradient(145deg,rgba(50,57,61,.82),rgba(15,19,21,.9));box-shadow:inset 0 1px rgba(255,255,255,.05),0 12px 30px rgba(0,0,0,.28)}.approval-card b{color:#eef3f4}.approval-card small{color:#8f9a9f}.approval-actions button{border-color:rgba(224,234,237,.18);background:rgba(255,255,255,.035);color:#c8d0d3}.approval-actions button:last-child{border-color:rgba(235,242,244,.36);color:#f0f4f5;box-shadow:inset 0 1px rgba(255,255,255,.06)}
+.fx-app>footer{color:#929ca0}.fx-app>footer i{color:#555f64}
+.feed{scrollbar-color:rgba(210,220,224,.3) transparent}.feed::-webkit-scrollbar-track{background:linear-gradient(90deg,transparent 3px,rgba(220,230,234,.06) 3px 4px,transparent 4px)}.feed::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(230,238,240,.06),rgba(215,225,228,.36),rgba(230,238,240,.06));border:2px solid transparent;background-clip:padding-box;box-shadow:none}
