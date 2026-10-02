@@ -63,3 +63,7 @@
 .approval-card b{font-size:10px;letter-spacing:.16em;color:#7eefff}.approval-card p{margin:4px 0 2px;font-size:12px;color:rgba(225,249,255,.86)}.approval-card small{font-size:9px;letter-spacing:.1em;color:rgba(143,205,219,.58)}
 .approval-actions{display:flex;gap:7px;flex-shrink:0}.approval-actions button{border:1px solid rgba(76,219,244,.24);border-radius:999px;padding:8px 12px;background:rgba(8,31,42,.9);color:rgba(202,244,252,.75);font-size:9px;letter-spacing:.11em;cursor:pointer}.approval-actions button:last-child{border-color:rgba(71,231,255,.56);color:#aaf6ff;box-shadow:0 0 12px rgba(53,221,255,.1)}.approval-actions button:hover:not(:disabled){background:rgba(26,104,122,.35)}.approval-actions button:disabled{opacity:.45;cursor:default}
 @media(max-width:700px){.approval-card{align-items:flex-start;flex-direction:column}.approval-actions{width:100%;justify-content:flex-end}}
+
+/* FX speaking stability · keep head centered */
+.state-speaking .holo-image{animation:none;transform:translate3d(0,0,0)}
+.state-speaking .avatar{transform:translate3d(0,0,0) scale(1.003)}
