@@ -3,6 +3,18 @@ function resolveProjectName(message:string){return /(?:fx-core|userfx|user fx|we
 function projectDoctorIntent(message:string){const q=message.toLowerCase();const project=/proyecto|web|app|build|compil|error|problema|producci[oó]n|deploy/.test(q);const inspect=/revis|diagnostic|chec|comprueb|verific|analiz|problema|error|qu[eé].*(mal|falla)|listo.*(producci[oó]n|subir|deploy)/.test(q);return project&&inspect}
 function fixIntent(message:string){return /corrig|repar|arregl|solucion|haz.*funcionar/i.test(message)}
 export async function handleFx(body:unknown){const b=(body||{})as FxRequest;const message=typeof b.message==='string'?b.message.trim():'';const sessionId=typeof b.sessionId==='string'&&b.sessionId.trim()?b.sessionId.trim():'default';if(!message&&!b.action)return{status:400,body:{ok:false,text:'Falta el mensaje.',error:'invalid_message'}};if(message.length>2000)return{status:413,body:{ok:false,text:'El mensaje es demasiado largo.',error:'message_too_large'}};if(message&&/(olvida|limpia|borra)\s+(el\s+)?(proyecto|contexto)/i.test(message)){clearSession(sessionId);return{status:200,body:{ok:true,text:'Contexto de proyecto limpiado.',intent:'session.clear'}};}const activate=message.match(/(?:trabaja|trabajar|usa|usar|abre|abrir)\s+(?:con\s+|el\s+|la\s+)?(.+)/i);if(activate){const p=setActiveProject(sessionId,activate[1]);if(p)return{status:200,body:{ok:true,text:`Proyecto activo: ${p.name}.`,intent:'session.project.set',result:{ok:true,action:'session.project.set',data:{project:p.name,repo:p.repo}}}};}const activeProject=touchProjectFromMessage(sessionId,message);
+if(message&&activeProject&&/(listo|preparad|ready).*(producci[oó]n|deploy|desplegar|subir)|(producci[oó]n|deploy).*(listo|preparad|ready)|revisa.*(todo|producci[oó]n)/i.test(message)){
+ const gitRun=await runAction('local.git.status',{project:activeProject.id});
+ const buildRun=await runAction('local.npm.build',{project:activeProject.id});
+ const git=gitRun.kind==='result'?gitRun.result:null;
+ const build=buildRun.kind==='result'?diagnoseBuild(buildRun.result):null;
+ let deployments:any=null;
+ if(activeProject.vercelProject){const vr=await runAction('vercel.project.deployments',{project:activeProject.vercelProject});if(vr.kind==='result')deployments=vr.result;}
+ const gitOk=Boolean(git?.ok),buildOk=Boolean(build?.ok),vercelOk=activeProject.vercelProject?Boolean(deployments?.ok):null;
+ const checks=[gitOk,buildOk,...(vercelOk===null?[]:[vercelOk])];const passed=checks.filter(Boolean).length;
+ const text=`Production Doctor: ${activeProject.name}. Build ${buildOk?'correcto':'con problemas'}; Git ${gitOk?'consultado':'no disponible'}; Vercel ${vercelOk===null?'no configurado':vercelOk?'consultado':'no disponible'}. ${passed}/${checks.length} comprobaciones completadas correctamente.`;
+ return{status:buildOk&&gitOk&&(vercelOk!==false)?200:400,body:{ok:buildOk&&gitOk&&(vercelOk!==false),text,intent:'production.doctor',action:'agent.production.doctor',result:{ok:buildOk&&gitOk&&(vercelOk!==false),action:'agent.production.doctor',data:{project:activeProject.name,git,build,vercel:deployments,checks:{git:gitOk,build:buildOk,vercel:vercelOk}}},meta:{brain:'rule',confidence:.99}}};
+}
 if(message&&activeProject&&projectDoctorIntent(message)){
  const statusRun=await runAction('local.git.status',{project:activeProject.id});
  const buildRun=await runAction('local.npm.build',{project:activeProject.id});
