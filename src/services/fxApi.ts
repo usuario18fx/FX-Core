@@ -12,7 +12,9 @@ async function postFx(body:Record<string,unknown>,signal?:AbortSignal):Promise<F
  let data:FxBrainResponse;
  try{data=await response.json() as FxBrainResponse}
  catch{throw new FxApiError(`/api/fx respondió HTTP ${response.status} sin JSON válido.`,response.status,'invalid_response')}
- if(!response.ok&&response.status!==202)throw new FxApiError(data.text||data.error||`FX API HTTP ${response.status}`,response.status,data.error);
+ // A structured FX response is valid even when the requested operation itself failed.
+ // Only transport/protocol failures should throw here.
+ if(response.status>=500)throw new FxApiError(data.text||data.error||`FX API HTTP ${response.status}`,response.status,data.error);
  return data;
 }
 
