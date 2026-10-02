@@ -16,6 +16,7 @@ function collect(text:string,re:RegExp,kind:'ts'|'vite'){
  }
  return out;
 }
+function tail(text:string,max=12){return text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(-max)}
 export function diagnoseBuild(result:ActionResult):BuildDiagnosis{
  const data=(result.data||{})as Record<string,unknown>;
  const stdout=String(data.stdout||''),stderr=String(data.stderr||'');
@@ -24,12 +25,13 @@ export function diagnoseBuild(result:ActionResult):BuildDiagnosis{
  if(!problems.length)problems=collect(combined,VITE,'vite');
  if(!problems.length&&!result.ok){
   const lines=combined.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-  const useful=lines.filter(x=>/error|failed|cannot|could not|not found|unresolved|ts\d+/i.test(x)).slice(0,8);
-  problems=useful.map(raw=>({message:raw,raw}));
+  const useful=lines.filter(x=>/error|failed|cannot|could not|not found|unresolved|ts\d+|npm err|ELIFECYCLE|terminated|timed?\s*out|timeout|aborted/i.test(x)).slice(-12);
+  const fallback=useful.length?useful:tail(combined,12);
+  problems=fallback.map(raw=>({message:raw,raw}));
  }
  const summary=result.ok
   ?'Build completado sin errores.'
   :problems.length?('Build falló con '+problems.length+' problema'+(problems.length===1?' detectado.':'s detectados.'))
-  :'Build falló; no pude extraer un error estructurado.';
+  :'Build falló sin salida de npm para diagnosticar.';
  return{ok:result.ok,summary,problems,stdout,stderr};
 }
