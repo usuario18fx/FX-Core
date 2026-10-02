@@ -2,3 +2,17 @@ import type{ActionResult}from'../types';const api='https://api.github.com';funct
 
 export async function githubRepo(args:Record<string,unknown>):Promise<ActionResult>{try{const repo=String(args.repo||'');if(!repo)throw new Error('missing_repo');const d=await gh(`/repos/${repo}`);return{ok:true,action:'github.repo.get',data:{name:d.full_name,private:d.private,defaultBranch:d.default_branch,url:d.html_url,updatedAt:d.updated_at,language:d.language,openIssues:d.open_issues_count}};}catch(e){return{ok:false,action:'github.repo.get',error:String(e)}}}
 export async function githubFile(args:Record<string,unknown>):Promise<ActionResult>{try{const repo=String(args.repo||''),path=String(args.path||''),ref=String(args.ref||'');if(!repo||!path)throw new Error('missing_repo_or_path');const suffix=ref?`?ref=${encodeURIComponent(ref)}`:'';const d=await gh(`/repos/${repo}/contents/${path}${suffix}`);if(Array.isArray(d))return{ok:true,action:'github.file.get',data:d.map((x:any)=>({name:x.name,path:x.path,type:x.type,size:x.size}))};const raw=d.encoding==='base64'&&typeof d.content==='string'?Buffer.from(d.content.replace(/\n/g,''),'base64').toString('utf8'):undefined;return{ok:true,action:'github.file.get',data:{name:d.name,path:d.path,size:d.size,sha:d.sha,content:raw?.slice(0,20000),truncated:Boolean(raw&&raw.length>20000)}};}catch(e){return{ok:false,action:'github.file.get',error:String(e)}}}
+
+export async function githubFileUpdate(args:Record<string,unknown>):Promise<ActionResult>{try{
+ const repo=String(args.repo||''),path=String(args.path||''),content=String(args.content??''),sha=String(args.sha||''),branch=String(args.branch||''),message=String(args.message||('FX: update '+path));
+ if(!repo||!path||!sha)throw new Error('missing_repo_path_or_sha');
+ if(content.length>500000)throw new Error('content_too_large');
+ const suffix=branch?'?ref='+encodeURIComponent(branch):'';
+ const current=await gh('/repos/'+repo+'/contents/'+encodeURI(path)+suffix);
+ if(Array.isArray(current)||!current.sha)throw new Error('file_not_found');
+ if(current.sha!==sha)throw new Error('sha_conflict_file_changed');
+ const body:Record<string,string>={message,content:Buffer.from(content,'utf8').toString('base64'),sha};
+ if(branch)body.branch=branch;
+ const d=await gh('/repos/'+repo+'/contents/'+encodeURI(path),{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+ return{ok:true,action:'github.file.update',data:{repo,path,branch:branch||undefined,previousSha:sha,sha:d.content?.sha,commitSha:d.commit?.sha,url:d.content?.html_url}};
+ }catch(e){return{ok:false,action:'github.file.update',error:String(e)}}}
