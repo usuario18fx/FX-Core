@@ -14,7 +14,8 @@ function projectPath(input:unknown){
  if(!project?.localPath)throw new Error('local_project_not_configured');
  const target=resolve(project.localPath),allowed=resolve('C:\\Projects');
  const rel=normalize(target).toLowerCase(),root=normalize(allowed).toLowerCase();
- const inside=rel===root||rel.startsWith(root+'\\\\')||rel.startsWith(root+'/');
+ const boundary=rel.slice(root.length,root.length+1);
+ const inside=rel===root||(rel.startsWith(root)&&(boundary==='\\\\'||boundary==='/'));
  if(!inside)throw new Error('local_path_not_allowed');
  return{project,target};
 }
