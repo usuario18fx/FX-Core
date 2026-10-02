@@ -14,7 +14,8 @@ function projectPath(input:unknown){
  if(!project?.localPath)throw new Error('local_project_not_configured');
  const target=resolve(project.localPath),allowed=resolve('C:\\Projects');
  const rel=normalize(target).toLowerCase(),root=normalize(allowed).toLowerCase();
- if(!(rel===root||rel.startsWith(root+'\\\\')||rel.startsWith(root+'/')))throw new Error('local_path_not_allowed');
+ const inside=rel===root||rel.startsWith(root+'\\\\')||rel.startsWith(root+'/');
+ if(!inside)throw new Error('local_path_not_allowed');
  return{project,target};
 }
 async function run(action:string,file:string,args:string[],cwd:string):Promise<ActionResult>{
@@ -24,4 +25,4 @@ async function run(action:string,file:string,args:string[],cwd:string):Promise<A
 export async function localGitStatus(args:Record<string,unknown>):Promise<ActionResult>{try{const{target}=projectPath(args.project);return run('local.git.status','git',['status','--short','--branch'],target)}catch(e){return{ok:false,action:'local.git.status',error:String(e)}}}
 export async function localGitDiff(args:Record<string,unknown>):Promise<ActionResult>{try{const{target}=projectPath(args.project);return run('local.git.diff','git',['diff','--'],target)}catch(e){return{ok:false,action:'local.git.diff',error:String(e)}}}
 export async function localGitLog(args:Record<string,unknown>):Promise<ActionResult>{try{const{target}=projectPath(args.project);return run('local.git.log','git',['log','-n','8','--oneline','--decorate'],target)}catch(e){return{ok:false,action:'local.git.log',error:String(e)}}}
-export async function localBuild(args:Record<string,unknown>):Promise<ActionResult>{try{const{target}=projectPath(args.project);return run('local.npm.build',process.platform==='win32'?'npm.cmd':'npm',['run','build'],target)}catch(e){return{ok:false,action:'local.npm.build',error:String(e)}}}
+export async function localBuild(args:Record<string,unknown>):Promise<ActionResult>{try{const{target}=projectPath(args.project);return run('local.npm.build',process.platform==='win32'?'npm.cmd':'npm',['run','build'],target)}catch(e){const message=e instanceof Error?e.message:String(e);return{ok:false,action:'local.npm.build',error:message,data:{stderr:message,stdout:'',exitCode:null}}}}
