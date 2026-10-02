@@ -5,6 +5,12 @@ function projectDoctorIntent(message:string){const q=message.toLowerCase();const
 function fixIntent(message:string){return /corrig|repar|arregl|solucion|haz.*funcionar/i.test(message)}
 export async function handleFx(body:unknown){const b=(body||{})as FxRequest;const message=typeof b.message==='string'?b.message.trim():'';const sessionId=typeof b.sessionId==='string'&&b.sessionId.trim()?b.sessionId.trim():'default';if(!message&&!b.action)return{status:400,body:{ok:false,text:'Falta el mensaje.',error:'invalid_message'}};if(message.length>2000)return{status:413,body:{ok:false,text:'El mensaje es demasiado largo.',error:'message_too_large'}};if(message&&/(olvida|limpia|borra)\s+(el\s+)?(proyecto|contexto)/i.test(message)){clearSession(sessionId);return{status:200,body:{ok:true,text:'Contexto de proyecto limpiado.',intent:'session.clear'}};}const activate=message.match(/(?:trabaja|trabajar|usa|usar|abre|abrir)\s+(?:con\s+|el\s+|la\s+)?(.+)/i);if(activate){const p=setActiveProject(sessionId,activate[1]);if(p)return{status:200,body:{ok:true,text:`Proyecto activo: ${p.name}.`,intent:'session.project.set',result:{ok:true,action:'session.project.set',data:{project:p.name,repo:p.repo}}}};}const activeProject=touchProjectFromMessage(sessionId,message);
 if(message&&activeProject&&/(listo|preparad|ready).*(producci[oó]n|deploy|desplegar|subir)|(producci[oó]n|deploy).*(listo|preparad|ready)|revisa.*(todo|producci[oó]n)/i.test(message)){
+ if(CLOUD_RUNTIME){
+  const investigation=await investigateProject(activeProject.name);
+  let deployments:any=null;
+  if(activeProject.vercelProject){const vr=await runAction('vercel.project.deployments',{project:activeProject.vercelProject});if(vr.kind==='result')deployments=vr.result;}
+  return{status:200,body:{ok:true,text:`Production Doctor cloud: ${activeProject.name}. GitHub revisado; Vercel ${activeProject.vercelProject?(deployments?.ok?'consultado':'no disponible'):'no configurado'}. El build local y Git local deben verificarse desde FX-Core en tu PC.`,intent:'production.doctor.cloud',action:'agent.production.doctor',result:{ok:true,action:'agent.production.doctor',data:{project:activeProject.name,github:investigation,build:null,git:null,vercel:deployments,cloudRuntime:true}},meta:{brain:'rule',confidence:.99}}};
+ }
  const gitRun=await runAction('local.git.status',{project:activeProject.id});
  const buildRun=await runAction('local.npm.build',{project:activeProject.id});
  const git=gitRun.kind==='result'?gitRun.result:null;
@@ -17,6 +23,10 @@ if(message&&activeProject&&/(listo|preparad|ready).*(producci[oó]n|deploy|despl
  return{status:buildOk&&gitOk&&(vercelOk!==false)?200:400,body:{ok:buildOk&&gitOk&&(vercelOk!==false),text,intent:'production.doctor',action:'agent.production.doctor',result:{ok:buildOk&&gitOk&&(vercelOk!==false),action:'agent.production.doctor',data:{project:activeProject.name,git,build,vercel:deployments,checks:{git:gitOk,build:buildOk,vercel:vercelOk}}},meta:{brain:'rule',confidence:.99}}};
 }
 if(message&&activeProject&&projectDoctorIntent(message)){
+ if(CLOUD_RUNTIME){
+  const investigation=await investigateProject(activeProject.name);
+  return{status:200,body:{ok:true,text:`Revisión cloud completada para ${activeProject.name}. Puedo revisar GitHub desde Vercel; para compilar, leer C:\\Projects o reparar archivos locales, usa FX-Core en tu PC.`,intent:'project.doctor.cloud',action:'agent.project.doctor',result:{ok:true,action:'agent.project.doctor',data:{project:activeProject.name,github:investigation,cloudRuntime:true}},meta:{brain:'rule',confidence:.99}}};
+ }
  const statusRun=await runAction('local.git.status',{project:activeProject.id});
  const buildRun=await runAction('local.npm.build',{project:activeProject.id});
  if(buildRun.kind==='result'){
