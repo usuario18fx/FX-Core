@@ -13,7 +13,8 @@ function projectPath(input:unknown){
  const project=FX_PROJECTS.find(p=>p.id===id||p.name.toLowerCase()===id.toLowerCase());
  if(!project?.localPath)throw new Error('local_project_not_configured');
  const target=resolve(project.localPath),allowed=resolve('C:\\Projects');
- if(!normalize(target).toLowerCase().startsWith(normalize(allowed).toLowerCase()))throw new Error('local_path_not_allowed');
+ const rel=normalize(target).toLowerCase(),root=normalize(allowed).toLowerCase();
+ if(!(rel===root||rel.startsWith(root+'\\\\')||rel.startsWith(root+'/')))throw new Error('local_path_not_allowed');
  return{project,target};
 }
 async function run(action:string,file:string,args:string[],cwd:string):Promise<ActionResult>{
