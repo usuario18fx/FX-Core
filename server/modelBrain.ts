@@ -15,3 +15,20 @@ export async function planWithModel(message:string):Promise<BrainPlan|null>{cons
 export async function interpretToolResult(message:string,action:string,result:unknown):Promise<string|null>{const payload=JSON.stringify(result);const clipped=payload.length>16000?payload.slice(0,16000)+'…':payload;const prompt=`The user asked: ${message||'(direct action)'}\nFX Core executed the read tool: ${action}\nTool result:\n${clipped}\n\nExplain the result to the user in the same language as their request. Be concise but useful. Use only facts present in the tool result. If it contains an error, explain that error without inventing a cause. Do not say merely "action completed".`;const local=await planWithOllama(prompt);if(local?.reply)return local.reply;const cloud=await planWithOpenAI(prompt);return cloud?.reply||null;}
 
 export async function interpretAgentRun(message:string,run:unknown):Promise<string|null>{const payload=JSON.stringify(run);const clipped=payload.length>24000?payload.slice(0,24000)+'…':payload;const prompt=`The user asked FX to investigate a project: ${message}\nFX executed a multi-tool read-only investigation. Results:\n${clipped}\n\nGive one concise diagnostic summary in the user's language. Separate observed facts from possible implications. Use only these results; do not invent failures or causes. Mention any tool step that failed.`;const local=await planWithOllama(prompt);if(local?.reply)return local.reply;const cloud=await planWithOpenAI(prompt);return cloud?.reply||null;}
+
+export async function prepareFileEdit(message:string,repo:string,path:string,currentContent:string,sha:string):Promise<BrainPlan|null>{
+ const prompt=`The user wants FX to modify a GitHub file.
+Repository: ${repo}
+Path: ${path}
+Current SHA: ${sha}
+User instruction: ${message}
+Current file:
+---FILE---
+${currentContent}
+---END FILE---
+Return ONLY valid JSON with exactly these fields: {"content":"complete replacement file","message":"short git commit message"}.
+Preserve unrelated code. Do not use markdown fences. Do not invent another repository or path.`;
+ const raw=(await planWithOllama(prompt))?.reply||(await planWithOpenAI(prompt))?.reply;
+ if(!raw)return null;
+ try{const cleaned=raw.trim().replace(/^\`\`\`(?:json)?\s*/i,'').replace(/\s*\`\`\`$/,'');const parsed=JSON.parse(cleaned)as{content?:unknown;message?:unknown};if(typeof parsed.content!=='string')return null;return{intent:'github.file.update',action:'github.file.update',args:{repo,path,sha,content:parsed.content,message:typeof parsed.message==='string'?parsed.message:`FX: update ${path}`},confidence:.9,source:'model',reasoning:{needsTool:true,needsApproval:true}}}catch{return null}
+}
