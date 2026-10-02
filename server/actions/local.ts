@@ -1,7 +1,7 @@
 import{execFile}from'node:child_process';
 import{promisify}from'node:util';
 import{resolve,normalize}from'node:path';
-import{FX_PROJECTS}from'./projectRegistry';
+import{FX_PROJECTS}from'../projectRegistry';
 import type{ActionResult}from'./types';
 
 const exec=promisify(execFile);
