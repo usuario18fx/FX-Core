@@ -6,5 +6,5 @@ export const FX_PROJECTS:FxProject[]=[
 {id:'fx-mxp',name:'Fx-mxp',aliases:['fx mxp','mxp'],repo:'usuario18fx/Fx-mxp',vercelProject:'fx-mxp',role:'Interfaz FX MXP'}
 ];
 const norm=(s:string)=>s.toLowerCase().trim();
-export function resolveProject(input:string){const q=norm(input);return FX_PROJECTS.find(p=>norm(p.name)===q||norm(p.id)===q||p.aliases.some(a=>norm(a)===q||q.includes(norm(a))));}
+export function resolveProject(input:string){const q=norm(input);const exact=FX_PROJECTS.find(p=>norm(p.name)===q||norm(p.id)===q||p.aliases.some(a=>norm(a)===q));if(exact)return exact;const matches=FX_PROJECTS.flatMap(p=>[p.name,p.id,...p.aliases].map(value=>({p,key:norm(value)}))).filter(x=>x.key.length>2&&q.includes(x.key)).sort((a,b)=>b.key.length-a.key.length);return matches[0]?.p;}
 export function projectContext(input:string){const p=resolveProject(input);return p?{projectId:p.id,projectName:p.name,repo:p.repo,localPath:p.localPath,vercelProject:p.vercelProject}:null;}
