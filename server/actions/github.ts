@@ -14,5 +14,5 @@ export async function githubFileUpdate(args:Record<string,unknown>):Promise<Acti
  const body:Record<string,string>={message,content:Buffer.from(content,'utf8').toString('base64'),sha};
  if(branch)body.branch=branch;
  const d=await gh('/repos/'+repo+'/contents/'+encodeURI(path),{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
- return{ok:true,action:'github.file.update',data:{repo,path,branch:branch||undefined,previousSha:sha,sha:d.content?.sha,commitSha:d.commit?.sha,url:d.content?.html_url}};
+ const verify=await gh('/repos/'+repo+'/contents/'+encodeURI(path)+(branch?'?ref='+encodeURIComponent(branch):''));const verifiedRaw=verify.encoding==='base64'&&typeof verify.content==='string'?Buffer.from(verify.content.replace(/\n/g,''),'base64').toString('utf8'):'';const verified=Boolean(verify.sha&&d.content?.sha&&verify.sha===d.content.sha&&verifiedRaw===content);if(!verified)return{ok:false,action:'github.file.update',error:'write_verification_failed',data:{repo,path,expectedSha:d.content?.sha,actualSha:verify.sha}};return{ok:true,action:'github.file.update',data:{repo,path,branch:branch||undefined,previousSha:sha,sha:verify.sha,commitSha:d.commit?.sha,url:d.content?.html_url,verified:true}};
  }catch(e){return{ok:false,action:'github.file.update',error:String(e)}}}
