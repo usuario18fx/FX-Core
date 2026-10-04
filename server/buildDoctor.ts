@@ -1,4 +1,4 @@
-import type{ActionResult}from'./types';
+import type{ActionResult}from'./types.ts';
 
 export type BuildProblem={file?:string;line?:number;column?:number;code?:string;message:string;raw:string};
 export type BuildDiagnosis={ok:boolean;summary:string;problems:BuildProblem[];stdout:string;stderr:string};
