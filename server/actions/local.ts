@@ -2,8 +2,8 @@ import{execFile}from'node:child_process';
 import{promisify}from'node:util';
 import{resolve,normalize,relative,isAbsolute}from'node:path';
 import{readFile,writeFile}from'node:fs/promises';
-import{FX_PROJECTS}from'../projectRegistry';
-import type{ActionResult}from'../types';
+import{FX_PROJECTS}from'../projectRegistry.ts';
+import type{ActionResult}from'../types.ts';
 
 const exec=promisify(execFile);
 const MAX_BUFFER=1024*1024;
