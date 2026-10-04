@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';dotenv.config({path:'.env.local'});import OpenAI from'openai';import type{BrainPlan}from'./types';
+import dotenv from 'dotenv';dotenv.config({path:'.env.local'});import OpenAI from'openai';import type{BrainPlan}from'./types.ts';
 const OLLAMA_URL=process.env.OLLAMA_URL||'http://127.0.0.1:11434';const OLLAMA_MODEL=process.env.OLLAMA_MODEL||'qwen3:4b';
 const FX_SYSTEM_PROMPT=`You are FX, the local AI assistant of USER FX.
 Your name is FX, pronounced F-X, letter by letter.
