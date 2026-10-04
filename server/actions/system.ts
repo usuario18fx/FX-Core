@@ -1,1 +1,1 @@
-import type{ActionResult}from'../types';export async function systemStatus():Promise<ActionResult>{return{ok:true,action:'system.status',data:{service:'FX Brain',status:'operational',version:'0.5.0',time:new Date().toISOString()}};}
+import type{ActionResult}from'../types.ts';export async function systemStatus():Promise<ActionResult>{return{ok:true,action:'system.status',data:{service:'FX Brain',status:'operational',version:'0.5.0',time:new Date().toISOString()}};}
