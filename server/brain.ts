@@ -1,6 +1,6 @@
-import type { BrainPlan } from './types';
-import { planWithModel } from './modelBrain';
-import { resolveProject } from './projectRegistry';
+import type { BrainPlan } from './types.ts';
+import { planWithModel } from './modelBrain.ts';
+import { resolveProject } from './projectRegistry.ts';
 const normalize=(message:string)=>message.trim().toLowerCase().replace(/\s+/g,' ');
 export async function planFx(message:string):Promise<BrainPlan>{
  const text=message.trim(),q=normalize(message);const project=resolveProject(text);
