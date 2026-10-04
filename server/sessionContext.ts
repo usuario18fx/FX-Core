@@ -1,4 +1,4 @@
-import{resolveProject,type FxProject}from'./projectRegistry';
+import{resolveProject,type FxProject}from'./projectRegistry.ts';
 type Session={project?:FxProject;updatedAt:number};
 const sessions=new Map<string,Session>();
 const TTL=1000*60*60*6;
