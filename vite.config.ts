@@ -1,4 +1,4 @@
-import{defineConfig,loadEnv,type Plugin}from'vite';import react from'@vitejs/plugin-react';import type{IncomingMessage,ServerResponse}from'node:http';import{handleFx}from'./server/fxHandler';
+import{defineConfig,loadEnv,type Plugin}from'vite';import react from'@vitejs/plugin-react';import type{IncomingMessage,ServerResponse}from'node:http';import{handleFx}from'./server/fxHandler.ts';
 async function readJson(req:IncomingMessage){let raw='';for await(const chunk of req)raw+=chunk;try{return raw?JSON.parse(raw):{};}catch{return{};}}
 async function readText(req:IncomingMessage){let raw='';for await(const chunk of req)raw+=chunk;return raw;}
 function fxApi():Plugin{return{name:'fx-local-api',configureServer(server){server.middlewares.use('/api/fx',async(req:IncomingMessage,res:ServerResponse)=>{if(req.method!=='POST'){res.statusCode=405;res.end(JSON.stringify({ok:false,error:'method_not_allowed'}));return;}const out=await handleFx(await readJson(req));res.statusCode=out.status;res.setHeader('content-type','application/json; charset=utf-8');res.end(JSON.stringify(out.body));});
