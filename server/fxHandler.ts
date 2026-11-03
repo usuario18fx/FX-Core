@@ -4,6 +4,17 @@ const CLOUD_RUNTIME=Boolean(process.env.VERCEL);
 function projectDoctorIntent(message:string){const q=message.toLowerCase();const project=/proyecto|web|app|build|compil|error|problema|producci[oó]n|deploy/.test(q);const inspect=/revis|diagnostic|chec|comprueb|verific|analiz|problema|error|qu[eé].*(mal|falla)|listo.*(producci[oó]n|subir|deploy)/.test(q);return project&&inspect}
 function fixIntent(message:string){return /corrig|repar|arregl|solucion|haz.*funcionar/i.test(message)}
 export async function handleFx(body:unknown){const b=(body||{})as FxRequest;const message=typeof b.message==='string'?b.message.trim():'';const sessionId=typeof b.sessionId==='string'&&b.sessionId.trim()?b.sessionId.trim():'default';if(!message&&!b.action)return{status:400,body:{ok:false,text:'Falta el mensaje.',error:'invalid_message'}};if(message.length>2000)return{status:413,body:{ok:false,text:'El mensaje es demasiado largo.',error:'message_too_large'}};if(message&&/(olvida|limpia|borra)\s+(el\s+)?(proyecto|contexto)/i.test(message)){clearSession(sessionId);return{status:200,body:{ok:true,text:'Contexto de proyecto limpiado.',intent:'session.clear'}};}const activate=message.match(/(?:trabaja|trabajar|usa|usar|abre|abrir)\s+(?:con\s+|el\s+|la\s+)?(.+)/i);if(activate){const p=setActiveProject(sessionId,activate[1]);if(p)return{status:200,body:{ok:true,text:`Proyecto activo: ${p.name}.`,intent:'session.project.set',result:{ok:true,action:'session.project.set',data:{project:p.name,repo:p.repo}}}};}const activeProject=touchProjectFromMessage(sessionId,message);
+if (/(?:último|ultimo|más reciente|mas reciente)/i.test(message) && /despliegue|deploy/i.test(message)) {
+  const project = activeProject?.vercelProject;
+  if (!project) return {status: 200, body: {ok: false, text: 'Selecciona en Proyectos una página vinculada a Vercel.'}};
+  const action = 'vercel.project.deployments';
+  const out = await runAction(action, {project});
+  if (out.kind !== 'result' || !out.result.ok) return {status: 400, body: {ok: false, action, text: `No pude consultar Vercel para ${project}. Revisa la configuración y los permisos del token.`}};
+  const [latest] = out.result.data as {state?:string}[];
+  const states: Record<string,string> = {READY:'listo', ERROR:'fallido', BUILDING:'en compilación', QUEUED:'en cola', CANCELED:'cancelado', INITIALIZING:'iniciándose'};
+  const text = latest ? `Último despliegue de ${project}: ${states[latest.state || ''] || latest.state || 'estado desconocido'}.` : `Vercel no registra despliegues para ${project}.`;
+  return {status: 200, body: {ok: true, action, text, result: out.result}};
+}
 if(message&&/(mis proyectos|lista.*proyectos|proyectos disponibles|project hub)/i.test(message)){return{status:200,body:{ok:true,text:`FX Projects Hub: ${FX_PROJECTS.length} proyectos disponibles.`,intent:'projects.list',action:'projects.list',result:{ok:true,action:'projects.list',data:{activeProject:activeProject?.id||null,projects:FX_PROJECTS.map(p=>({id:p.id,name:p.name,role:p.role,repo:p.repo,vercelProject:p.vercelProject||null}))}},meta:{brain:'rule',confidence:1}}};}
 if(message&&activeProject&&/(listo|preparad|ready).*(producci[oó]n|deploy|desplegar|subir)|(producci[oó]n|deploy).*(listo|preparad|ready)|revisa.*(todo|producci[oó]n)/i.test(message)){
  if(CLOUD_RUNTIME){
