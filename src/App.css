@@ -140,3 +140,11 @@
 @keyframes fxAirMessage{from{opacity:0;transform:translateY(18px);filter:blur(4px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}@keyframes fxPinPulse{50%{border-color:rgba(235,242,244,.42);box-shadow:0 0 16px rgba(235,242,244,.06)}}
 @media(max-width:820px){.fx-pin-rail{right:8px;top:76px}.fx-pin{max-width:160px}}
 @media(prefers-reduced-motion:reduce){.msg,.fx-pin.executing{animation:none}}
+
+/* Holographic terrain around the original FX Memoji. */
+.presence{position:relative;isolation:isolate}
+.presence::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:url('/assets/fx-field.svg') center / 100% auto no-repeat,radial-gradient(ellipse at 50% 47%,#053348 0%,transparent 62%)}
+.presence .avatar{opacity:1;filter:contrast(1.06) saturate(1.05) drop-shadow(0 0 2px #5be6ff) drop-shadow(0 0 12px #0085b8)}
+.state-speaking .presence::before,.state-listening .presence::before{animation:fxFieldPulse 2s ease-in-out infinite alternate}
+@keyframes fxFieldPulse{to{filter:brightness(1.45)}}
+@media(prefers-reduced-motion:reduce){.state-speaking .presence::before,.state-listening .presence::before{animation:none}}
