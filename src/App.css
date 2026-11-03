@@ -165,3 +165,17 @@
   .topbar nav {justify-self:center}
   .topbar .live {display:none}
 }
+
+@media(max-width:820px){
+  .workspace{grid-template: minmax(0,1fr) / minmax(0,1fr);isolation:isolate}
+  .workspace>.presence,.workspace>.direct{grid-area:1/1}
+  .workspace>.presence{align-items:flex-start;pointer-events:none}
+  .presence .avatar-wrap{height:55%}
+  .presence::before{background-position:center 18%}
+  .presence>p,.direct>header{display:none}
+  .workspace>.direct{z-index:2;align-self:stretch;grid-template-rows:minmax(0,1fr) auto 56px;padding-top:min(36dvh,300px);background:transparent}
+  .workspace>.direct:has(.approval-card){grid-template-rows:minmax(0,1fr) auto auto 56px}
+  .direct .feed{mask-image:linear-gradient(to bottom,transparent,#000 32%);scroll-padding-top:20%;overscroll-behavior:contain}
+  .feed::before{content:"";margin-top:auto}
+  .feed>.msg{flex-shrink:0}
+}
