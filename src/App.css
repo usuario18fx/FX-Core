@@ -179,3 +179,14 @@
   .feed::before{content:"";margin-top:auto}
   .feed>.msg{flex-shrink:0}
 }
+.avatar-shell{display:contents}
+@media(max-width:820px){
+ .avatar-shell{display:grid;position:relative;height:100%;max-width:100%;aspect-ratio:1;place-items:center;--light:#4acfff}
+ .avatar-shell .avatar{width:100%;height:100%;object-fit:contain}
+ .avatar-shell::after{content:"";pointer-events:none;position:absolute;z-index:6;left:50%;top:50%;width:38%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,var(--light),transparent 69%);transform:translate(-50%,-50%);opacity:.25;animation:fxBreath 3s ease-in-out infinite alternate}
+ .state-listening .avatar-shell{--light:#00ffd0}
+ .state-thinking .avatar-shell,.state-processing .avatar-shell,.state-executing .avatar-shell{--light:#ac70ff}
+ .state-speaking .avatar-shell::after{animation:none;--light:color-mix(in srgb,#ffab28,#ff538a calc(var(--fx-volume,.3)*100%));opacity:calc(.32 + var(--fx-volume,.3)*.65);transform:translate(-50%,-50%) scale(calc(.8 + var(--fx-volume,.3)*1.5));transition:transform 80ms,opacity 80ms}
+ @keyframes fxBreath{to{opacity:.55}}
+}
+@media(prefers-reduced-motion:reduce){.avatar-shell::after,.state-speaking .avatar-shell::after{animation:none;transform:translate(-50%,-50%)}}
