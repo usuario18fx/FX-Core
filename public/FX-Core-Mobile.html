@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#06080d">
+<meta name="description" content="FX Core — interfaz móvil experimental de voz, chat y avatar luminoso.">
+<title>FX Core · Mobile Interface</title>
+<style>
+:root{color-scheme:dark;--bg:#06080d;--ink:#f7f9ff;--muted:#9099af;--line:rgba(187,210,255,.13);--light:#5bcaff;--light2:#306dfa;--light3:#a673fa;--aura:rgba(57,143,255,.29);--shadow:rgba(59,147,255,.35);--panel:rgba(13,18,29,.55)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;width:100%;background:#06080d;color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}button:focus-visible,input:focus-visible{outline:2px solid var(--light);outline-offset:3px}button:disabled{opacity:.5;cursor:not-allowed}
+body{display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse 47% 75% at 52% 46%,#101827 0%,#080c13 60%,#040507 100%)}
+.app{width:min(100%,480px);height:100svh;min-height:550px;max-height:1000px;position:relative;isolation:isolate;display:flex;flex-direction:column;overflow:hidden;background:radial-gradient(ellipse 70% 54% at 50% 52%,#141d2b 0%,#090e16 58%,#070a10 96%);box-shadow:0 30px 100px #0009}
+@media(min-width:600px){body{padding:22px}.app{height:min(920px,calc(100svh - 44px));border:1px solid #273448;border-radius:38px;box-shadow:0 30px 100px #000b,0 0 90px #14274840}}
+.app:before{content:"";position:absolute;inset:-20%;z-index:-3;pointer-events:none;background:radial-gradient(closest-side at 50% 47%,var(--aura),transparent 68%);filter:blur(35px);transition:background 800ms ease;animation:breathe 8s ease-in-out infinite}
+.app:after{content:"";position:absolute;inset:0;z-index:7;pointer-events:none;border-radius:inherit;box-shadow:inset 0 0 85px #03050982,inset 0 0 2px #9fb6e330}
+@keyframes breathe{0%,100%{opacity:.55;transform:scale(.91)}50%{opacity:.95;transform:scale(1.08)}}
+.noise{position:absolute;inset:0;pointer-events:none;z-index:-1;opacity:.2;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.68' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.2'/%3E%3C/svg%3E")}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:calc(env(safe-area-inset-top,0px) + 22px) 25px 9px;z-index:9}
+.brand{display:flex;gap:12px;align-items:center}.brandmark{height:38px;width:38px;border-radius:13px;background:linear-gradient(142deg,#eaf7ff1f,#60a6ff0c);border:1px solid #d7edff35;display:grid;place-items:center;box-shadow:0 0 25px #63a6fc19}.brandmark span{font-size:17px;font-weight:850;letter-spacing:-.15em;margin-right:3px}.brand-title{font-size:13px;font-weight:800;letter-spacing:.22em}.brand-caption{font-size:9px;letter-spacing:.22em;color:#75869e;margin-top:5px}.top-actions{display:flex;align-items:center;gap:12px}.status-pill{display:flex;align-items:center;gap:6px;color:#9babc3;font-size:10px;letter-spacing:.13em;font-weight:750}.status-dot{height:6px;width:6px;background:#71edce;border-radius:50%;box-shadow:0 0 10px #71edce8f}.icon-btn{border:1px solid #9db8ec20;background:#dbe9ff0a;width:34px;height:34px;border-radius:11px;color:#b8c7db;display:grid;place-items:center;transition:background .2s}.icon-btn:hover{background:#dbe9ff19}.icon-btn svg{height:17px;width:17px}
+.main{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}.thin-line{position:absolute;top:18px;left:50%;transform:translateX(-50%);width:1px;height:50px;background:linear-gradient(transparent,#759dff4d,transparent)}
+.stage{position:relative;flex:1;width:100%;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.scene{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);height:min(67vw,332px);width:min(76vw,370px);max-height:350px;max-width:390px;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1}
+.scene .ring{position:absolute;top:50%;left:50%;border-radius:50%;border:1px solid var(--light);transform:translate(-50%,-50%) rotateX(72deg);opacity:.11;filter:drop-shadow(0 0 5px var(--light));transition:opacity .3s}.ring-1{width:88%;height:85%}.ring-2{width:116%;height:111%}.ring-3{width:135%;height:130%}
+.halo{position:absolute;width:78%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,var(--shadow) 0%,transparent 72%);filter:blur(28px);opacity:.73;animation:halo 5s ease-in-out infinite;transition:background 700ms}
+@keyframes halo{50%{opacity:1;transform:scale(1.15)}}
+.particles{position:absolute;inset:0}.particle{position:absolute;width:2px;height:2px;border-radius:50%;background:var(--light);opacity:.16;left:var(--x);top:var(--y);box-shadow:0 0 10px var(--light);animation:float var(--d) ease-in-out infinite alternate;animation-delay:var(--delay)}
+@keyframes float{from{transform:translate3d(0,12px,0);opacity:.05}to{transform:translate3d(6px,-16px,0);opacity:.64}}
+.avatar{width:65%;height:92%;max-height:350px;position:relative;filter:drop-shadow(0 16px 28px #02040ba1);animation:avatarFloat 5.2s ease-in-out infinite}.avatar>*{position:absolute}
+@keyframes avatarFloat{0%,100%{transform:translateY(2px)}50%{transform:translateY(-6px)}}
+.avatar .shoulders{z-index:0;left:6%;bottom:0;width:88%;height:25%;border-radius:60% 60% 30% 30%/72% 72% 25% 25%;background:radial-gradient(ellipse at 50% 0%,#52627a,#1c2637 46%,#0d1320 74%,#060b12);border:1px solid #a6c9ff20;box-shadow:inset 0 20px 25px #8793af13,0 0 36px var(--aura)}
+.avatar .neck{z-index:1;left:38%;bottom:16%;width:24%;height:22%;background:linear-gradient(100deg,#182238,#56637a 48%,#1a263c 85%);border-radius:0 0 36% 36%;box-shadow:inset 3px 0 11px #fff2}
+.avatar .head{z-index:2;left:17%;top:7%;width:66%;height:77%;border-radius:47% 47% 46% 46%/39% 40% 53% 53%;overflow:hidden;background:radial-gradient(ellipse at 43% 40%,#8f9cba 0%,#62758f 17%,#384961 40%,#18253e 68%,#0b1324 88%);box-shadow:inset -20px -11px 38px #000b,inset 8px 0 20px #e4f9ff3b,0 0 0 1px #dcecff15,0 0 36px var(--aura);transition:box-shadow .6s}
+.avatar .head:before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(ellipse at 29% 27%,#d6e3ff52 0%,transparent 30%),linear-gradient(116deg,transparent 34%,#cce8ff18 52%,transparent 68%);mix-blend-mode:screen}
+.avatar .head:after{content:"";position:absolute;width:59%;height:105%;left:42%;top:2%;border-radius:50%;border-left:1px solid #d7e5ff38;transform:rotate(-17deg);filter:blur(.5px)}
+.avatar .hair{z-index:3;top:1%;left:14%;width:73%;height:41%;border-radius:53% 55% 27% 30%/75% 70% 27% 26%;background:radial-gradient(ellipse at 49% 0%,#4d6179 0%,#263145 47%,#0b1322 82%);box-shadow:inset 6px 8px 12px #d6edff18,inset -12px -8px 20px #0009;border-top:1px solid #8ab7e953;transform:rotate(-1deg);clip-path:polygon(4% 9%,18% 0%,78% 0%,95% 15%,100% 72%,87% 69%,76% 79%,60% 70%,45% 88%,20% 70%,0% 93%)}
+.avatar .left-ear,.avatar .right-ear{z-index:1;top:47%;height:17%;width:9%;background:linear-gradient(#71839b,#26364c);border-radius:50%;box-shadow:inset 1px 0 5px #d8eeff42}.avatar .left-ear{left:12%}.avatar .right-ear{right:12%}
+.avatar .crest{z-index:5;left:50%;top:43%;height:15%;width:2px;transform:translateX(-50%);opacity:.5;background:linear-gradient(transparent,var(--light),transparent);filter:blur(7px);box-shadow:0 0 15px 5px var(--light);animation:corePulse 5s ease-in-out infinite}
+@keyframes corePulse{50%{opacity:.22}}
+.aura-arc{position:absolute;z-index:2;left:50%;top:50%;width:77%;aspect-ratio:1;border-radius:50%;border:1px solid transparent;border-top-color:var(--light);border-right-color:var(--light2);opacity:.27;transform:translate(-50%,-50%) rotate(-40deg);box-shadow:0 -8px 38px -12px var(--light),inset 0 8px 23px -20px var(--light);animation:orbit 12s linear infinite;transition:opacity .4s}
+@keyframes orbit{to{transform:translate(-50%,-50%) rotate(320deg)}}
+.state-speaking .aura-arc{opacity:.78;animation-duration:3s}.state-listening .aura-arc{opacity:.58;animation-duration:7s}.state-thinking .aura-arc{opacity:.72;animation-duration:2.5s}.state-speaking .ring{opacity:.27;animation:outward 1.7s ease-out infinite}.state-speaking .ring-2{animation-delay:.5s}.state-speaking .ring-3{animation-delay:1s}
+@keyframes outward{0%{opacity:.43;scale:.87}100%{opacity:0;scale:1.25}}
+.state-listening{--light:#4af0cc;--light2:#00ae9c;--light3:#72e8b6;--aura:rgba(21,223,179,.29);--shadow:rgba(33,242,180,.34)}.state-thinking{--light:#c2a3ff;--light2:#9157f8;--light3:#e4a7fa;--aura:rgba(162,90,255,.30);--shadow:rgba(180,100,255,.35)}.state-speaking{--light:#72b6ff;--light2:#8b7aff;--light3:#e4a0ff;--aura:rgba(119,102,255,.32);--shadow:rgba(118,141,255,.42)}
+.state-speaking .halo{animation:talkGlow .75s ease-in-out infinite alternate}@keyframes talkGlow{to{opacity:1;transform:scale(1.2);filter:blur(18px)}}
+.message-stream{position:absolute;top:2%;bottom:6%;left:23px;right:23px;z-index:4;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-end;gap:12px;pointer-events:none;overflow:hidden;mask-image:linear-gradient(to bottom,transparent 0%,#000 20%,#000 86%,transparent 100%)}
+.bubble{display:flex;flex-direction:column;gap:7px;max-width:83%;padding:12px 14px;border:1px solid #b0d4ff24;background:#121c2bc7;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 9px 30px #0005;border-radius:16px 16px 16px 5px;align-self:flex-start;color:#dceaff;font-size:13px;line-height:1.48;animation:messageIn .5s cubic-bezier(.15,.8,.25,1) both;overflow-wrap:anywhere}.bubble.me{align-self:flex-end;background:#1a2f47c9;border-color:#9cd2ff3d;border-radius:16px 16px 5px 16px}.bubble .who{font-size:9px;letter-spacing:.16em;font-weight:800;color:#9bb7de}.bubble.me .who{color:#7fbee2}.bubble.old{opacity:.1;transform:translateY(-10px);transition:transform .8s,opacity .8s}.bubble.leave{animation:fadeUp .7s ease forwards}@keyframes messageIn{from{opacity:0;transform:translateY(23px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes fadeUp{to{opacity:0;transform:translateY(-45px)}}
+.bottom-panel{position:relative;z-index:8;padding:0 20px calc(env(safe-area-inset-bottom,0px) + 18px);background:linear-gradient(transparent,#080c14bb 26%,#070a11ed 85%)}
+.state-region{display:flex;flex-direction:column;align-items:center;gap:10px;padding-bottom:20px}.state-label{font-size:10px;font-weight:800;letter-spacing:.28em;color:var(--light);text-transform:uppercase;transition:color .4s}.state-desc{color:#8596aa;font-size:11px;letter-spacing:.02em;text-align:center}
+.wave{display:flex;gap:4px;height:25px;align-items:center;justify-content:center}.wave span{display:block;width:3px;height:4px;border-radius:4px;background:var(--light);opacity:.67;transition:background .4s}.state-listening .wave span,.state-speaking .wave span{animation:wave 900ms ease-in-out infinite alternate;animation-delay:calc(var(--i)*-95ms)}.state-thinking .wave span{animation:wave 1350ms ease-in-out infinite alternate;animation-delay:calc(var(--i)*-120ms)}@keyframes wave{from{height:4px;opacity:.35}to{height:22px;opacity:1}}
+.composer{display:flex;align-items:center;gap:7px;height:58px;padding:7px;border:1px solid #9bbbe12c;border-radius:19px;background:linear-gradient(110deg,#141d2bfa,#0e1622e6);box-shadow:0 12px 38px #0007,inset 0 1px #ecf7ff0a}.composer input{flex:1;min-width:0;height:100%;padding:0 9px;background:none;border:0;outline:none;color:#f0f6ff;font-size:13px}.composer input::placeholder{color:#637589}.composer-btn{width:42px;height:42px;flex-shrink:0;display:grid;place-items:center;border:none;border-radius:13px;color:#b9cbdf;background:#c9e9ff0c}.composer-btn svg{width:19px;height:19px}.composer-btn.mic-on{color:#071014;background:linear-gradient(140deg,var(--light),var(--light2));box-shadow:0 0 17px var(--aura)}.composer-btn.send{background:#9bc7ff15;color:#d0e9ff}.composer-btn.send:hover{background:#a2cbff33}.hint{text-align:center;margin-top:11px;font-size:9px;letter-spacing:.08em;color:#6a7a8c}.modes{display:flex;justify-content:center;align-items:center;gap:9px;padding:16px 0 14px}.mode{border:1px solid #a6b8d723;background:#b5cfff08;color:#8e9eb0;padding:9px 13px;border-radius:999px;font-size:10px;font-weight:650;letter-spacing:.04em;transition:background .2s,color .2s,border-color .2s}.mode[aria-pressed="true"]{background:color-mix(in srgb,var(--light) 14%,transparent);border-color:color-mix(in srgb,var(--light) 38%,transparent);color:var(--light)}.mode:active{transform:scale(.98)}
+.settings{position:absolute;top:80px;right:22px;z-index:15;width:min(270px,calc(100% - 44px));padding:16px;background:#121b2bf7;border:1px solid #758fbb47;border-radius:18px;box-shadow:0 15px 50px #000a;display:none}.settings.open{display:block}.settings h3{font-size:13px;letter-spacing:.07em;margin:0 0 12px}.setting-item{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:#cad6e5;padding:12px 0;border-top:1px solid #fff1}.setting-item input{accent-color:#6aafff;appearance:auto;width:17px;height:17px}.setting-note{font-size:10px;color:#8597a7;line-height:1.6;margin:8px 0 0}.footer-version{font-size:9px;color:#58667a;letter-spacing:.13em;margin-top:8px;text-align:center}
+@media(max-height:690px){.topbar{padding-top:calc(env(safe-area-inset-top,0px) + 13px)}.scene{top:45%;height:min(50vh,280px);width:min(60vw,310px)}.bubble{font-size:12px;padding:9px 11px}.state-region{padding-bottom:10px;gap:5px}.modes{padding:7px 0 10px}.bottom-panel{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 9px)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<div class="app state-idle" id="app">
+  <div class="noise" aria-hidden="true"></div>
+  <header class="topbar">
+    <div class="brand"><div class="brandmark" aria-hidden="true"><span>F<span style="color:#8acbff">X</span></span></div><div><div class="brand-title">FX CORE</div><div class="brand-caption">MOBILE INTELLIGENCE</div></div></div>
+    <div class="top-actions"><div class="status-pill"><span class="status-dot"></span><span id="onlineText">DEMO</span></div><button class="icon-btn" id="settingsBtn" type="button" aria-label="Configuración" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.86l.06.06-1.9 1.9-.06-.06A1.7 1.7 0 0 0 16 18.4a1.7 1.7 0 0 0-1 .8V21H9v-1.8a1.7 1.7 0 0 0-1-.8 1.7 1.7 0 0 0-1.86.34l-.06.06-1.9-1.9.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.8-1H2v-4h1.8a1.7 1.7 0 0 0 .8-1 1.7 1.7 0 0 0-.34-1.86L4.2 7.08l1.9-1.9.06.06A1.7 1.7 0 0 0 8 5.6a1.7 1.7 0 0 0 1-.8V3h6v1.8a1.7 1.7 0 0 0 1 .8 1.7 1.7 0 0 0 1.86-.34l.06-.06 1.9 1.9-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 .8 1H22v4h-1.8a1.7 1.7 0 0 0-.8 1z"/></svg></button></div>
+  </header>
+  <aside class="settings" id="settingsPanel" aria-label="Opciones de FX Core"><h3>CONFIGURACIÓN</h3><label class="setting-item">Leer respuestas en voz alta <input id="voiceToggle" type="checkbox" checked></label><label class="setting-item">Animaciones de luz <input id="motionToggle" type="checkbox" checked></label><p class="setting-note">Prototipo visual local. Las respuestas son de demostración; no está conectado aún al motor de IA de FX Core.</p></aside>
+  <main class="main"><div class="thin-line"></div>
+    <section class="stage" aria-label="Avatar y conversación FX Core">
+      <div class="scene" aria-hidden="true"><div class="halo"></div><div class="ring ring-1"></div><div class="ring ring-2"></div><div class="ring ring-3"></div><div class="particles" id="particles"></div><div class="aura-arc"></div><div class="avatar"><div class="shoulders"></div><div class="neck"></div><div class="left-ear"></div><div class="right-ear"></div><div class="head"></div><div class="hair"></div><div class="crest"></div></div></div>
+      <div class="message-stream" id="messages" role="log" aria-live="polite" aria-label="Conversación"></div>
+    </section>
+  </main>
+  <footer class="bottom-panel">
+    <div class="state-region"><div class="wave" aria-hidden="true" id="wave"><span style="--i:0"></span><span style="--i:1"></span><span style="--i:2"></span><span style="--i:3"></span><span style="--i:4"></span><span style="--i:5"></span><span style="--i:6"></span><span style="--i:7"></span><span style="--i:8"></span><span style="--i:9"></span><span style="--i:10"></span><span style="--i:11"></span><span style="--i:12"></span></div><div class="state-label" id="stateLabel" role="status">EN ESPERA</div><div class="state-desc" id="stateDesc">Escribe un mensaje o activa el micrófono</div></div>
+    <form class="composer" id="composer" autocomplete="off"><button class="composer-btn" id="clearBtn" type="button" title="Limpiar conversación" aria-label="Limpiar conversación"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14M12 5v14"/></svg></button><input id="messageInput" aria-label="Mensaje para FX Core" placeholder="Habla con FX..." maxlength="600"><button class="composer-btn mic-on" id="micBtn" type="button" aria-label="Iniciar escucha"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg></button><button class="composer-btn send" type="submit" aria-label="Enviar mensaje"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12 16-8-5 16-3.5-6.5zM11.5 13.5 20 4"/></svg></button></form>
+    <nav class="modes" aria-label="Previsualizar estados"><button type="button" class="mode" data-mode="listening" aria-pressed="false">Escuchando</button><button type="button" class="mode" data-mode="thinking" aria-pressed="false">Pensando</button><button type="button" class="mode" data-mode="speaking" aria-pressed="false">Hablando</button></nav>
+    <div class="hint">UNA SOLA INTERFAZ · VOZ + CHAT + PRESENCIA</div><div class="footer-version">FX CORE / CONCEPT 0.4</div>
+  </footer>
+</div>
+<script>
+(()=>{
+  'use strict';
+  const $=id=>document.getElementById(id);
+  const app=$('app'),messages=$('messages'),input=$('messageInput'),label=$('stateLabel'),desc=$('stateDesc'),mic=$('micBtn'),modes=[...document.querySelectorAll('[data-mode]')];
+  const names={idle:['EN ESPERA','Escribe un mensaje o activa el micrófono'],listening:['ESCUCHANDO','La luz reacciona mientras hablas'],thinking:['PROCESANDO','FX está preparando una respuesta'],speaking:['HABLANDO','La energía fluye hacia el exterior']};
+  let state='idle',voice=true,recognition=null,job=0,transitionTimer=null,motion=true;
+  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  function setState(next){
+    if(!names[next])return;
+    state=next;app.classList.remove('state-idle','state-listening','state-thinking','state-speaking');app.classList.add('state-'+next);
+    label.textContent=names[next][0];desc.textContent=names[next][1];
+    modes.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===next)));
+    mic.classList.toggle('mic-on',next!=='listening');mic.setAttribute('aria-label',next==='listening'?'Detener escucha':'Iniciar escucha');
+  }
+  function addMessage(text,who='fx'){
+    if(!text.trim())return;
+    const bubble=document.createElement('div');bubble.className='bubble'+(who==='me'?' me':'');
+    const caption=document.createElement('span');caption.className='who';caption.textContent=who==='me'?'TÚ':'FX CORE';
+    const content=document.createElement('span');content.textContent=text;
+    bubble.append(caption,content);messages.append(bubble);
+    [...messages.children].slice(0,-3).forEach(n=>n.classList.add('old'));
+    if(messages.children.length>6){const old=messages.firstElementChild;old?.classList.add('leave');setTimeout(()=>old?.remove(),720)}
+    setTimeout(()=>{if(bubble.isConnected && bubble!==messages.lastElementChild)bubble.classList.add('old')},16000);
+  }
+  function stopVoice(){if('speechSynthesis'in window)window.speechSynthesis.cancel()}
+  function stopListening(){if(recognition){try{recognition.abort()}catch{}recognition=null}if(state==='listening')setState('idle')}
+  function respond(query){
+    const s=query.toLowerCase();
+    if(/hola|hey|buenas/.test(s))return 'Hola. FX Core está listo. ¿Qué necesitas hacer?';
+    if(/hora|fecha|día es/.test(s))return 'En tu dispositivo son las '+new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})+'.';
+    if(/nota|guardar|recordar/.test(s))return 'Podremos guardar notas, lugares e ideas cuando conectemos el motor de FX. Esta interfaz muestra el flujo de voz y chat.';
+    if(/mapa|ubicaci[oó]n|gps/.test(s))return 'La conexión con FX City y el mapa es el siguiente módulo de integración.';
+    if(/qué puedes|que puedes|funciones|ayuda/.test(s))return 'Puedo mostrar los estados de escucha, procesamiento y respuesta, con mensajes que se elevan y desaparecen. La inteligencia real todavía debe conectarse.';
+    return 'Mensaje recibido. Esta es una respuesta de demostración: el diseño está preparado para conectarse a FX Core.';
+  }
+  function speak(text,token){
+    setState('speaking');
+    if(!voice||!('speechSynthesis'in window)){transitionTimer=setTimeout(()=>{if(token===job)setState('idle')},2200);return}
+    try{
+      stopVoice();const u=new SpeechSynthesisUtterance(text);u.lang='es-ES';u.rate=1;u.pitch=.93;u.volume=.95;
+      u.onend=()=>{if(token===job)setState('idle')};u.onerror=()=>{if(token===job)setState('idle')};window.speechSynthesis.speak(u);
+      transitionTimer=setTimeout(()=>{if(token===job&&state==='speaking')setState('idle')},Math.max(4000,Math.min(16000,text.length*75)));
+    }catch{setState('idle')}
+  }
+  function send(text){
+    const message=String(text||'').trim();if(!message)return;
+    job++;const token=job;clearTimeout(transitionTimer);stopListening();stopVoice();addMessage(message,'me');input.value='';setState('thinking');
+    transitionTimer=setTimeout(()=>{if(token!==job)return;const answer=respond(message);addMessage(answer);speak(answer,token)},980);
+  }
+  $('composer').addEventListener('submit',e=>{e.preventDefault();send(input.value)});
+  $('clearBtn').addEventListener('click',()=>{job++;clearTimeout(transitionTimer);stopListening();stopVoice();messages.replaceChildren();setState('idle');addMessage('Conversación reiniciada. Puedes hablar o escribir.')});
+  function beginListening(){
+    if(state==='listening'){stopListening();return}
+    job++;clearTimeout(transitionTimer);stopVoice();stopListening();setState('listening');
+    if(!SpeechRecognition){addMessage('El reconocimiento de voz no está disponible en este navegador. Puedes escribir en el campo inferior.');return}
+    try{
+      const r=new SpeechRecognition();recognition=r;r.lang='es-ES';r.interimResults=true;r.continuous=false;
+      r.onresult=e=>{let final='',interim='';for(let i=e.resultIndex;i<e.results.length;i++){const s=e.results[i][0].transcript;if(e.results[i].isFinal)final+=s;else interim+=s}input.value=final||interim;if(final){recognition=null;send(final)}};
+      r.onerror=e=>{if(recognition!==r)return;recognition=null;setState('idle');if(e.error!=='aborted'&&e.error!=='no-speech')addMessage('No se pudo activar el micrófono. Revisa los permisos del navegador o escribe tu mensaje.')};
+      r.onend=()=>{if(recognition===r){recognition=null;if(state==='listening')setState('idle')}};
+      r.start();
+    }catch{recognition=null;setState('idle');addMessage('El micrófono requiere permiso y, normalmente, una conexión HTTPS o localhost.')}
+  }
+  mic.addEventListener('click',beginListening);
+  modes.forEach(b=>b.addEventListener('click',()=>{job++;clearTimeout(transitionTimer);stopVoice();stopListening();setState(state===b.dataset.mode?'idle':b.dataset.mode)}));
+  const settings=$('settingsPanel'),settingsBtn=$('settingsBtn');
+  settingsBtn.addEventListener('click',()=>{const open=!settings.classList.contains('open');settings.classList.toggle('open',open);settingsBtn.setAttribute('aria-expanded',String(open))});
+  $('voiceToggle').addEventListener('change',e=>{voice=e.target.checked;if(!voice)stopVoice()});
+  $('motionToggle').addEventListener('change',e=>{motion=e.target.checked;app.style.setProperty('animation-play-state',motion?'running':'paused');document.querySelectorAll('.avatar,.halo,.aura-arc,.particle,.ring').forEach(n=>n.style.animationPlayState=motion?'running':'paused')});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){settings.classList.remove('open');settingsBtn.setAttribute('aria-expanded','false');if(state==='listening')stopListening()}});
+  const particles=$('particles');for(let i=0;i<34;i++){const span=document.createElement('span');span.className='particle';span.style.setProperty('--x',(8+(i*71)%85)+'%');span.style.setProperty('--y',(6+(i*47)%91)+'%');span.style.setProperty('--d',(2+(i%7)*.55)+'s');span.style.setProperty('--delay',(-i*.21)+'s');particles.append(span)}
+  addMessage('FX Core listo. Una sola interfaz para voz, chat y presencia visual.');setState('idle');
+})();
+</script>
+</body>
+</html>
