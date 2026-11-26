@@ -1,0 +1,27 @@
+name: FX Nod read-only MCP pilot
+
+on:
+  push:
+    branches:
+      - feature/fx-core-nod-readonly-mcp-pilot-20261125
+  pull_request:
+    paths:
+      - "nod-pilot/**"
+      - ".github/workflows/nod-readonly-pilot.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Check syntax
+        run: node --check nod-pilot/server.mjs && node --check nod-pilot/server.test.mjs
+      - name: Test read-only contract
+        run: node --test nod-pilot/server.test.mjs
