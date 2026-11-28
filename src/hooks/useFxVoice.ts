@@ -16,6 +16,7 @@ export function useFxVoice(){
  const running=useRef(false);
  const modeRef=useRef<Mode>('test');
  const ready=useRef(false);
+ const responseId=useRef<string|null>(null);
  const pc=useRef<RTCPeerConnection|null>(null);
  const stream=useRef<MediaStream|null>(null);
  const audio=useRef<HTMLAudioElement|null>(null);
@@ -35,6 +36,7 @@ export function useFxVoice(){
   epoch.current++;
   running.current=false;
   ready.current=false;
+  responseId.current=null;
   request.current?.abort();
   request.current=null;
   clearMeter();
@@ -106,6 +108,8 @@ export function useFxVoice(){
      switch(ev.type){
       case 'input_audio_buffer.speech_started':
        epoch.current++;speaking=false;setState('listening');break;
+      case 'response.created':
+       responseId.current=typeof ev.response?.id==='string'?ev.response.id:null;break;
       case 'input_audio_buffer.speech_stopped':
        setState('thinking');break;
       case 'conversation.item.input_audio_transcription.completed':
@@ -125,6 +129,7 @@ export function useFxVoice(){
       case 'output_audio_buffer.cleared':
        speaking=false;setState('listening');break;
       case 'response.done':
+       if(responseId.current===ev.response?.id)responseId.current=null;
        if(!speaking)setState('listening');break;
       case 'error':
        setError(ev.error?.message||'Realtime error.');setState('error');break;
@@ -170,7 +175,10 @@ export function useFxVoice(){
    if(utterance.current){utterance.current=null;window.speechSynthesis.cancel()}
   }else{
    const dc=channel.current;
-   if(dc?.readyState==='open')dc.send(JSON.stringify({type:'output_audio_buffer.clear'}));
+   if(dc?.readyState==='open'){
+    if(responseId.current)dc.send(JSON.stringify({type:'response.cancel',response_id:responseId.current}));
+    dc.send(JSON.stringify({type:'output_audio_buffer.clear'}));
+   }
   }
   if(running.current&&ready.current)setState('listening');
  },[]);
