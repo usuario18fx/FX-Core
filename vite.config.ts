@@ -2,11 +2,11 @@ import{defineConfig,loadEnv,type Plugin}from'vite';import react from'@vitejs/plu
 async function readJson(req:IncomingMessage){let raw='';for await(const chunk of req)raw+=chunk;try{return raw?JSON.parse(raw):{};}catch{return{};}}
 async function readText(req:IncomingMessage){let raw='';for await(const chunk of req)raw+=chunk;return raw;}
 function fxApi():Plugin{return{name:'fx-local-api',configureServer(server){server.middlewares.use('/api/fx',async(req:IncomingMessage,res:ServerResponse)=>{if(req.method!=='POST'){res.statusCode=405;res.end(JSON.stringify({ok:false,error:'method_not_allowed'}));return;}const out=await handleFx(await readJson(req));res.statusCode=out.status;res.setHeader('content-type','application/json; charset=utf-8');res.end(JSON.stringify(out.body));});
-server.middlewares.use('/api/realtime/session',async(req:IncomingMessage,res:ServerResponse)=>{if(req.method!=='POST'){res.statusCode=405;res.end('method_not_allowed');return;}const key=process.env.OPENAI_API_KEY;if(!key){res.statusCode=503;res.end('OPENAI_API_KEY_not_configured');return;}const sdp=await readText(req);const session = {
+server.middlewares.use('/api/realtime/session',async(req:IncomingMessage,res:ServerResponse)=>{if(req.method!=='POST'){res.statusCode=405;res.end('method_not_allowed');return;}if(process.env.VITE_FX_REALTIME_ENABLED!=='true'){res.statusCode=403;res.end('Realtime disabled. Set VITE_FX_REALTIME_ENABLED=true only when ready to use paid API credits.');return;}const key=process.env.OPENAI_API_KEY;if(!key){res.statusCode=503;res.end('OPENAI_API_KEY_not_configured');return;}const sdp=await readText(req);const session = {
   type: 'realtime',
   model: process.env.OPENAI_REALTIME_MODEL || 'gpt-realtime',
   audio: {
-    input: { transcription: { model: 'gpt-4o-mini-transcribe' }, turn_detection: { type: 'server_vad', create_response: false } },
+    input: { transcription: { model: 'gpt-4o-mini-transcribe' }, turn_detection: { type: 'server_vad', create_response: false, interrupt_response: true } },
     output: { voice: process.env.OPENAI_REALTIME_VOICE || 'cedar' }
   }
 };
